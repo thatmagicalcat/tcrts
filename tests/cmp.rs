@@ -8,7 +8,7 @@ type _2 = Next<_1>;
 type _3 = Next<_2>;
 
 #[test]
-fn test_to_val() {
+fn to_val() {
     assert_eq!(<_0 as ToVal>::VALUE, 0);
     assert_eq!(<_1 as ToVal>::VALUE, 1);
     assert_eq!(<_2 as ToVal>::VALUE, 2);
@@ -16,7 +16,7 @@ fn test_to_val() {
 }
 
 #[test]
-fn test_peano_eq() {
+fn peano_eq() {
     type Eq0_0 = <_0 as PeanoEq<_0>>::Output;
     type Eq1_1 = <_1 as PeanoEq<_1>>::Output;
     type Eq0_1 = <_0 as PeanoEq<_1>>::Output;
@@ -27,7 +27,7 @@ fn test_peano_eq() {
 }
 
 #[test]
-fn test_peano_lt() {
+fn peano_lt() {
     type Lt0_1 = <_0 as PeanoLt<_1>>::Output;
     type Lt1_2 = <_1 as PeanoLt<_2>>::Output;
     type Lt2_1 = <_2 as PeanoLt<_1>>::Output;
@@ -38,7 +38,7 @@ fn test_peano_lt() {
 }
 
 #[test]
-fn test_peano_gt() {
+fn peano_gt() {
     type Gt0_1 = <_0 as PeanoGt<_1>>::Output;
     type Gt1_0 = <_1 as PeanoGt<_0>>::Output;
     type Gt2_1 = <_2 as PeanoGt<_1>>::Output;
@@ -49,7 +49,7 @@ fn test_peano_gt() {
 }
 
 #[test]
-fn test_peano_geq() {
+fn peano_geq() {
     type Geq0_0 = <_0 as PeanoGEq<_0>>::Output;
     type Geq1_0 = <_1 as PeanoGEq<_0>>::Output;
     type Geq1_2 = <_1 as PeanoGEq<_2>>::Output;
@@ -60,7 +60,7 @@ fn test_peano_geq() {
 }
 
 #[test]
-fn test_peano_leq() {
+fn peano_leq() {
     type Leq0_0 = <_0 as PeanoLEq<_0>>::Output;
     type Leq0_1 = <_0 as PeanoLEq<_1>>::Output;
     type Leq2_1 = <_2 as PeanoLEq<_1>>::Output;
