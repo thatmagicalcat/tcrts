@@ -1,21 +1,7 @@
 #![recursion_limit = "2048"]
 #![allow(unused)]
 
-mod arithmetic;
-mod binaryop;
-mod boolean;
-mod cmp;
-mod list;
-mod number;
-mod value;
-
-use arithmetic::*;
-use binaryop::*;
-use boolean::*;
-use cmp::*;
-use list::*;
-use number::*;
-use value::*;
+use ts_abuse::all::*;
 
 fn main() {
     type _0 = Zero;

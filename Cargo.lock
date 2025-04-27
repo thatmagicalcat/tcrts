@@ -41,7 +41,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "typesystem-abuse"
+name = "ts-abuse"
 version = "0.1.0"
 dependencies = [
  "macros",
