@@ -1,4 +1,4 @@
-use crate::ToVal;
+use crate::value::ToVal;
 
 pub trait Boolean {}
 pub struct True;

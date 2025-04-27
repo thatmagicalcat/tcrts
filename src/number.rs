@@ -1,4 +1,4 @@
-use crate::ToVal;
+use crate::value::ToVal;
 
 pub trait Num {}
 
