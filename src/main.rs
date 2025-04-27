@@ -3,44 +3,28 @@
 
 use ts_abuse::all::*;
 
+type _0 = Zero;
+type _1 = Next<_0>;
+type _2 = Next<_1>;
+type _3 = Next<_2>;
+type _4 = Next<_3>;
+type _5 = Next<_4>;
+type _6 = Next<_5>;
+type _7 = Next<_6>;
+type _8 = Next<_7>;
+type _9 = Next<_8>;
+
+struct Square;
+impl<N: Num + Mul<N>> MapFn<N> for Square {
+    type Output = <N as Mul<N>>::Output;
+}
+
 fn main() {
-    type _0 = Zero;
-    type _1 = Next<_0>;
-    type _2 = Next<_1>;
-    type _3 = Next<_2>;
-    type _4 = Next<_3>;
-    type _5 = Next<_4>;
+    type List = macros::list![_0, _1, _2, _3, _4, _5, _6, _7, _8, _9];
 
-    // just in case
-    type Hundred = macros::apply!(Next, Zero, 100);
+    // square all elements
+    type ListSq = <List as Map<Square>>::Output;
 
-    println!("4 + 5 = {}", <_4 as Add<_5>>::Output::VALUE);
-    println!("4 < 5 = {}", <_4 as PeanoLt<_5>>::Output::VALUE);
-    println!("1 == 1 = {}", <_1 as PeanoEq<_1>>::Output::VALUE);
-    println!("1 >= 2 = {}", <_1 as PeanoGEq<_2>>::Output::VALUE);
-
-    // [0, 1, 2, 5]
-    type List = Cons<_0, Cons<_1, Cons<_2, Cons<_5, Nil>>>>;
-
-    println!("List[3] = {}", <List as GetIndex<_3>>::Output::VALUE);
-    println!("Length: {}", List::LENGTH);
-
-    // append 4
-    // [0, 1, 2, 5, 4]
-    type Appended = <List as Append<_4>>::Output;
-    println!(
-        "Appended List[4] = {}",
-        <Appended as GetIndex<_4>>::Output::VALUE
-    );
-    println!("Appended Length: {}", Appended::LENGTH);
-
-
-    // pop last
-    // [0, 1, 2]
-    // popped item: 5
-    type PoppedList = <List as Pop>::Output;
-    type PoppedItem = <List as Pop>::Item;
-
-    println!("Popped Length: {}", PoppedList::LENGTH);
-    println!("Popped Item: {}", PoppedItem::VALUE);
+    println!("        list: {:?}", macros::list_to_array!(List, 0..=9));
+    println!("squared list: {:?}", macros::list_to_array!(ListSq, 0..=9));
 }
