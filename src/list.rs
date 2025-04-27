@@ -12,6 +12,14 @@ pub trait Append<Item> {
     type Output;
 }
 
+pub trait Pop {
+    /// New list
+    type Output;
+
+    /// The popped item
+    type Item;
+}
+
 pub struct Cons<H, T>(std::marker::PhantomData<(H, T)>);
 pub struct Nil;
 
@@ -45,4 +53,15 @@ impl<Item> Append<Item> for Nil {
 
 impl<H, T: Length> Length for Cons<H, T> {
     const LENGTH: usize = 1 + T::LENGTH;
+}
+
+// pop [I] = []
+impl<I> Pop for Cons<I, Nil> {
+    type Output = Nil;
+    type Item = I;
+}
+
+impl<H, T: Pop> Pop for Cons<H, T> {
+    type Output = Cons<H, <T as Pop>::Output>;
+    type Item = <T as Pop>::Item;
 }

@@ -7,6 +7,7 @@ mod boolean;
 mod cmp;
 mod list;
 mod number;
+mod value;
 
 use arithmetic::*;
 use binaryop::*;
@@ -14,6 +15,7 @@ use boolean::*;
 use cmp::*;
 use list::*;
 use number::*;
+use value::*;
 
 fn main() {
     type _0 = Zero;
@@ -45,4 +47,14 @@ fn main() {
         <Appended as GetIndex<_4>>::Output::VALUE
     );
     println!("Appended Length: {}", Appended::LENGTH);
+
+
+    // pop last
+    // [0, 1, 2]
+    // popped item: 5
+    type PoppedList = <List as Pop>::Output;
+    type PoppedItem = <List as Pop>::Item;
+
+    println!("Popped Length: {}", PoppedList::LENGTH);
+    println!("Popped Item: {}", PoppedItem::VALUE);
 }
