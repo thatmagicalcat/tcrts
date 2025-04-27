@@ -1,5 +1,7 @@
 use crate::number::*;
 
+pub trait List {}
+
 pub trait Length {
     const LENGTH: usize;
 }
@@ -20,8 +22,35 @@ pub trait Pop {
     type Item;
 }
 
+pub trait MapFn<Input> {
+    type Output;
+}
+
+pub trait Map<F> {
+    type Output;
+}
+
+impl<N: Num, F: MapFn<N>> Map<F> for N {
+    type Output = <F as MapFn<N>>::Output;
+}
+
+impl<F> Map<F> for Nil {
+    type Output = Nil;
+}
+
+impl<H, T, F> Map<F> for Cons<H, T>
+where
+    F: MapFn<H>,
+    T: Map<F>,
+{
+    type Output = Cons<<F as MapFn<H>>::Output, <T as Map<F>>::Output>;
+}
+
 pub struct Cons<H, T>(std::marker::PhantomData<(H, T)>);
 pub struct Nil;
+
+impl<H, T> List for Cons<H, T> {}
+impl List for Nil {}
 
 impl Length for Nil {
     const LENGTH: usize = 0;
