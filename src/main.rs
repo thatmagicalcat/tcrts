@@ -17,7 +17,7 @@ type _9 = Next<_8>;
 type _50 = macros::apply!(Next, Zero, 50);
 
 struct Square;
-impl<N: Num + PeanoMul<N>> TypeFn<N> for Square {
+impl<N: Num + ts_abuse::arithmetic::PeanoMul<N>> TypeFn<N> for Square {
     type Output = <N as PeanoMul<N>>::Output;
 }
 
@@ -27,6 +27,16 @@ where
     N: Num + PeanoLt<_50>,
 {
     type Output = <N as PeanoLt<_50>>::Output;
+}
+
+struct GetLeft;
+impl<L, R> TypeFn<Pair<L, R>> for GetLeft {
+    type Output = L;
+}
+
+struct GetRight;
+impl<L, R> TypeFn<Pair<L, R>> for GetRight {
+    type Output = R;
 }
 
 fn main() {
@@ -43,4 +53,14 @@ fn main() {
         "filtered list: {:?}",
         macros::list_to_array!(FilteredList, 0..=7) // two items removed
     );
+
+    type List2 = macros::list![_1, _1, _1, _1];
+    type Enumerated = <List2 as Enumerate>::Output;
+    println!("enumerated: {}", std::any::type_name::<Enumerated>());
+
+    type LeftEnumerated = <Enumerated as Map<GetLeft>>::Output;
+    println!("left: {:?}", macros::list_to_array!(LeftEnumerated, 0..=3));
+
+    type RightEnumerated = <Enumerated as Map<GetRight>>::Output;
+    println!("right: {:?}", macros::list_to_array!(RightEnumerated, 0..=3));
 }
