@@ -1,4 +1,5 @@
 pub mod append;
+pub mod enumerate;
 pub mod filter;
 pub mod index;
 pub mod length;
@@ -7,6 +8,7 @@ pub mod pop;
 
 pub mod all {
     pub use super::append::*;
+    pub use super::enumerate::*;
     pub use super::filter::*;
     pub use super::index::*;
     pub use super::length::*;
