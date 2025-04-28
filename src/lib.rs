@@ -5,6 +5,7 @@ pub mod cmp;
 pub mod function;
 pub mod list;
 pub mod number;
+pub mod pair;
 pub mod value;
 
 pub mod all {
@@ -15,5 +16,6 @@ pub mod all {
     pub use crate::function::*;
     pub use crate::list::all::*;
     pub use crate::number::*;
+    pub use crate::pair::*;
     pub use crate::value::*;
 }
