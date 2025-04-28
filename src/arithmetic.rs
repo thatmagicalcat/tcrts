@@ -1,36 +1,36 @@
 use super::number::*;
 
-pub trait Add<N> {
+pub trait PeanoAdd<N> {
     type Output: Num;
 }
 
-pub trait Mul<N> {
+pub trait PeanoMul<N> {
     type Output;
 }
 
 // N * 0 = 0
-impl<N: Num> Mul<Zero> for N {
+impl<N: Num> PeanoMul<Zero> for N {
     type Output = Zero;
 }
 
-impl<N, M> Mul<Next<M>> for N
+impl<N, M> PeanoMul<Next<M>> for N
 where
-    N: Num + Mul<M> + Add<<N as Mul<M>>::Output>,
+    N: Num + PeanoMul<M> + PeanoAdd<<N as PeanoMul<M>>::Output>,
     M: Num,
 {
-    type Output = <N as Add<<N as Mul<M>>::Output>>::Output;
+    type Output = <N as PeanoAdd<<N as PeanoMul<M>>::Output>>::Output;
 }
 
 // Base case, N + Zero = N
-impl<N: Num> Add<Zero> for N {
+impl<N: Num> PeanoAdd<Zero> for N {
     type Output = N;
 }
 
 // N + Next<M> = Next<N + Next<M - 1>>
-impl<N, M> Add<Next<M>> for N
+impl<N, M> PeanoAdd<Next<M>> for N
 where
-    N: Num + Add<M>,
+    N: Num + PeanoAdd<M>,
     M: Num,
 {
-    type Output = Next<<N as Add<M>>::Output>;
+    type Output = Next<<N as PeanoAdd<M>>::Output>;
 }

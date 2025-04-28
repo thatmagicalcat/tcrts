@@ -17,8 +17,8 @@ type _9 = Next<_8>;
 type _50 = macros::apply!(Next, Zero, 50);
 
 struct Square;
-impl<N: Num + Mul<N>> TypeFn<N> for Square {
-    type Output = <N as Mul<N>>::Output;
+impl<N: Num + PeanoMul<N>> TypeFn<N> for Square {
+    type Output = <N as PeanoMul<N>>::Output;
 }
 
 struct LessThan50;
