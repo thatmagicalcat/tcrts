@@ -133,6 +133,6 @@ pub fn list_to_array(input: TokenStream) -> TokenStream {
     });
 
     quote! {[
-        #(<#list as ts_abuse::list::GetIndex<#indexing_type>>::Output::VALUE),*
+        #(<#list as ts_abuse::list::index::GetIndex<#indexing_type>>::Output::VALUE),*
     ]}.into()
 }
