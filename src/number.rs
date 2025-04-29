@@ -4,15 +4,15 @@ use crate::value::ToVal;
 /// Zero is the base case for the recursive definition of Peano numbers.
 /// All other numbers can be represented by wrapping `Zero` in `Next` type
 /// that many times.
-/// 
+///
 /// # Example
 /// ```rust
 /// use ts_abuse::all::*;
-/// 
+///
 /// type _0 = Zero;
 /// type _1 = Next<_0>;
 /// type _2 = Next<_1>;
-/// 
+///
 /// assert_eq!(_0::VALUE, 0);
 /// assert_eq!(_1::VALUE, 1);
 /// assert_eq!(_2::VALUE, 2);
