@@ -17,7 +17,7 @@ type TestList = macros::list![_1, _9, _6, _3, _5, _7];
 
 #[test]
 fn length() {
-    assert_eq!(TestList::LENGTH, 6);
+    assert_eq!(<TestList as Length>::Output::VALUE, 6);
 }
 
 #[test]
@@ -31,7 +31,7 @@ fn append() {
     // [1, 9, 6, 3, 5, 7, 0]
     type NewList = <TestList as Append<_0>>::Output;
 
-    assert_eq!(NewList::LENGTH, 7);
+    assert_eq!(<NewList as Length>::Output::VALUE, 7);
     assert_eq!(<NewList as GetIndex<_6>>::Output::VALUE, 0);
 }
 
@@ -41,6 +41,6 @@ fn pop() {
     type NewList = <TestList as Pop>::Output;
     type PopItem = <TestList as Pop>::Item;
 
-    assert_eq!(NewList::LENGTH, 5);
+    assert_eq!(<NewList as Length>::Output::VALUE, 5);
     assert_eq!(PopItem::VALUE, 7);
 }

@@ -54,13 +54,29 @@ fn main() {
         macros::list_to_array!(FilteredList, 0..=7) // two items removed
     );
 
-    type List2 = macros::list![_1, _1, _1, _1];
+    type List2 = macros::list![_1, _1, _1, _9];
+    type List2Length = <List2 as Length>::Output;
+
+    #[rustfmt::skip]
+    type Last = <
+        List2 as GetIndex<
+            <
+                <List2 as Length>::Output
+                as PeanoSub<_1> // length - 1
+            >::Output
+        >
+    >::Output;
+
+    println!("Last element: {}", Last::VALUE);
+
     type Enumerated = <List2 as Enumerate>::Output;
-    println!("enumerated: {}", std::any::type_name::<Enumerated>());
 
     type LeftEnumerated = <Enumerated as Map<GetLeft>>::Output;
     println!("left: {:?}", macros::list_to_array!(LeftEnumerated, 0..=3));
 
     type RightEnumerated = <Enumerated as Map<GetRight>>::Output;
-    println!("right: {:?}", macros::list_to_array!(RightEnumerated, 0..=3));
+    println!(
+        "right: {:?}",
+        macros::list_to_array!(RightEnumerated, 0..=3)
+    );
 }

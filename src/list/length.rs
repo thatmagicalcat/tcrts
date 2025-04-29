@@ -1,14 +1,19 @@
 use super::*;
 
+type _1 = Next<Zero>;
+
 pub trait Length {
-    const LENGTH: usize;
+    type Output;
 }
 
-impl<H, T: Length> Length for Cons<H, T> {
-    const LENGTH: usize = 1 + T::LENGTH;
+impl<H, T> Length for Cons<H, T>
+where
+    T: Length,
+    <T as Length>::Output: Num,
+{
+    type Output = <<T as Length>::Output as PeanoAdd<_1>>::Output;
 }
 
 impl Length for Nil {
-    const LENGTH: usize = 0;
+    type Output = Zero;
 }
-
