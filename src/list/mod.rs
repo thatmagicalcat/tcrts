@@ -5,6 +5,8 @@ pub mod index;
 pub mod length;
 pub mod map;
 pub mod pop;
+pub mod remove;
+pub mod replace;
 
 pub mod all {
     pub use super::append::*;
@@ -14,6 +16,8 @@ pub mod all {
     pub use super::length::*;
     pub use super::map::*;
     pub use super::pop::*;
+    pub use super::remove::*;
+    pub use super::replace::*;
     pub use super::*;
 }
 
