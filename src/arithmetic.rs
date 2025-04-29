@@ -4,6 +4,10 @@ pub trait PeanoAdd<N> {
     type Output: Num;
 }
 
+pub trait PeanoSub<N> {
+    type Output: Num;
+}
+
 pub trait PeanoMul<N> {
     type Output;
 }
@@ -33,4 +37,18 @@ where
     M: Num,
 {
     type Output = Next<<N as PeanoAdd<M>>::Output>;
+}
+
+// N - 0 = N
+impl<N: Num> PeanoSub<Zero> for N {
+    type Output = N;
+}
+
+// Next<N> - Next<M> = N - M
+impl<N, M> PeanoSub<Next<M>> for Next<N>
+where
+    N: Num + PeanoSub<M>,
+    M: Num,
+{
+    type Output = <N as PeanoSub<M>>::Output;
 }
