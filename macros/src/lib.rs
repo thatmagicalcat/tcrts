@@ -127,12 +127,12 @@ pub fn list_to_array(input: TokenStream) -> TokenStream {
     let indexing_type = range.map(|i| {
         repeat_internal(
             i,
-            quote! { ts_abuse::number::Next },
-            quote! { ts_abuse::number::Zero },
+            quote! { tcrts::number::Next },
+            quote! { tcrts::number::Zero },
         )
     });
 
     quote! {[
-        #(<#list as ts_abuse::list::index::GetIndex<#indexing_type>>::Output::VALUE),*
+        #(<#list as tcrts::list::index::GetIndex<#indexing_type>>::Output::VALUE),*
     ]}.into()
 }

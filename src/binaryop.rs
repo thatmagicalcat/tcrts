@@ -1,10 +1,31 @@
 use crate::boolean::*;
 
+/// Type level nand operation.
+pub trait NAnd<B: Boolean> {
+    type Output: Boolean;
+}
+
+impl NAnd<False> for False {
+    type Output = True;
+}
+
+impl NAnd<True> for False {
+    type Output = True;
+}
+
+impl NAnd<False> for True {
+    type Output = True;
+}
+
+impl NAnd<True> for True {
+    type Output = False;
+}
+
 /// Type level binay not operation.
 /// 
 /// # Example
 /// ```rust
-/// use ts_abuse::all::*;
+/// use tcrts::all::*;
 /// 
 /// assert_eq!(True::VALUE, <False as Not>::Output::VALUE);
 /// ```
@@ -12,11 +33,12 @@ pub trait Not {
     type Output: Boolean;
 }
 
+
 /// Type level binary and operation.
 /// 
 /// # Example
 /// ```rust
-/// use ts_abuse::all::*;
+/// use tcrts::all::*;
 /// 
 /// assert_eq!(True::VALUE, <True as And<True>>::Output::VALUE);    // 1 & 1 = 1
 /// assert_eq!(False::VALUE, <True as And<False>>::Output::VALUE);  // 1 & 0 = 0
@@ -31,7 +53,7 @@ pub trait And<B: Boolean> {
 /// 
 /// # Example
 /// ```rust
-/// use ts_abuse::all::*;
+/// use tcrts::all::*;
 /// 
 /// assert_eq!(True::VALUE, <True as Or<True>>::Output::VALUE);    // 1 | 1 = 1
 /// assert_eq!(True::VALUE, <True as Or<False>>::Output::VALUE);   // 1 | 0 = 1
@@ -46,7 +68,7 @@ pub trait Or<B: Boolean> {
 /// 
 /// # Example
 /// ```rust
-/// use ts_abuse::all::*;
+/// use tcrts::all::*;
 /// 
 /// assert_eq!(False::VALUE, <True as Xor<True>>::Output::VALUE);   // 1 ^ 1 = 0
 /// assert_eq!(True::VALUE, <True as Xor<False>>::Output::VALUE);   // 1 ^ 0 = 1

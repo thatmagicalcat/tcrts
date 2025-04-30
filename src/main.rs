@@ -1,7 +1,7 @@
 #![recursion_limit = "2048"]
 #![allow(unused)]
 
-use ts_abuse::all::*;
+use tcrts::all::*;
 
 type _0 = Zero;
 type _1 = Next<_0>;
@@ -59,7 +59,7 @@ impl<NextInstrs, Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Cons<Dec, Ne
 where
     DataArray: GetIndex<Ptr>
         + Replace<Ptr, <<DataArray as GetIndex<Ptr>>::Output as PeanoSub<Next<Zero>>>::Output>,
-    <DataArray as GetIndex<Ptr>>::Output: PeanoSub<ts_abuse::number::Next<Zero>>,
+    <DataArray as GetIndex<Ptr>>::Output: PeanoSub<tcrts::number::Next<Zero>>,
     NextInstrs: Interpret<
             Ptr,
             <DataArray as Replace<
@@ -114,7 +114,7 @@ fn main() {
 }
 
 // struct Square;
-// impl<N: Num + ts_abuse::arithmetic::PeanoMul<N>> TypeFn<N> for Square {
+// impl<N: Num + tcrts::arithmetic::PeanoMul<N>> TypeFn<N> for Square {
 //     type Output = <N as PeanoMul<N>>::Output;
 // }
 

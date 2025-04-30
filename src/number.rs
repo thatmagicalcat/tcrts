@@ -7,7 +7,7 @@ use crate::value::ToVal;
 ///
 /// # Example
 /// ```rust
-/// use ts_abuse::all::*;
+/// use tcrts::all::*;
 ///
 /// type _0 = Zero;
 /// type _1 = Next<_0>;

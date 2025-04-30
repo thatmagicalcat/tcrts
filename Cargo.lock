@@ -41,7 +41,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ts-abuse"
+name = "tcrts"
 version = "0.1.0"
 dependencies = [
  "macros",

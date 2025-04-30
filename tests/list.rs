@@ -1,6 +1,6 @@
 #![recursion_limit = "2048"]
 
-use ts_abuse::all::*;
+use tcrts::all::*;
 
 type _0 = Zero;
 type _1 = Next<_0>;

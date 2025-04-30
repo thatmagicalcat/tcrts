@@ -3,7 +3,7 @@
 /// # Example
 /// A type level function to square a number
 /// ```rust
-/// use ts_abuse::all::*;
+/// use tcrts::all::*;
 /// 
 /// struct SquareFn;
 /// impl <N: Num + PeanoMul<N>> TypeFn<N> for SquareFn {
