@@ -38,8 +38,9 @@ impl<Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Nil {
 }
 
 // + instruction
-impl<NextInstrs, Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Cons<Inc, NextInstrs>
+impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Inc, NextInstrs>
 where
+    Ptr: Num,
     DataArray: GetIndex<Ptr> + GetIndex<_0> + Replace<Ptr, Next<tcrts::index!(DataArray, Ptr)>>,
     NextInstrs:
         Interpret<Ptr, tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>)>,
@@ -51,10 +52,11 @@ where
 }
 
 // - instruction
-impl<NextInstrs, Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Cons<Dec, NextInstrs>
+impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Dec, NextInstrs>
 where
+    Ptr: Num,
     DataArray: GetIndex<Ptr> + Replace<Ptr, tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)>,
-    <DataArray as GetIndex<Ptr>>::Output: PeanoSub<tcrts::number::Next<Zero>>,
+    <DataArray as GetIndex<Ptr>>::Output: PeanoSub<_1>,
     NextInstrs: Interpret<
             Ptr,
             tcrts::replace!(
@@ -75,8 +77,9 @@ where
 }
 
 // > instruction
-impl<NextInstrs, Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Cons<Shr, NextInstrs>
+impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Shr, NextInstrs>
 where
+    Ptr: Num,
     NextInstrs: Interpret<Next<Ptr>, DataArray>,
 {
     type DataArray = <NextInstrs as Interpret<Next<Ptr>, DataArray>>::DataArray;
@@ -85,8 +88,8 @@ where
 // < instruction
 impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Shl, NextInstrs>
 where
-    Ptr: Num + PeanoSub<Next<Zero>>,
-    NextInstrs: Interpret<<Ptr as PeanoSub<Next<Zero>>>::Output, DataArray>,
+    Ptr: Num + PeanoSub<_1>,
+    NextInstrs: Interpret<tcrts::subtract!(Ptr, _1), DataArray>,
 {
     type DataArray = <NextInstrs as Interpret<tcrts::subtract!(Ptr, _1), DataArray>>::DataArray;
 }
