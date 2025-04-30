@@ -40,40 +40,37 @@ impl<Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Nil {
 // + instruction
 impl<NextInstrs, Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Cons<Inc, NextInstrs>
 where
-    DataArray:
-        GetIndex<Ptr> + GetIndex<_0> + Replace<Ptr, Next<<DataArray as GetIndex<Ptr>>::Output>>,
-    <DataArray as GetIndex<Ptr>>::Output: Num,
-    NextInstrs: Interpret<
-            Ptr,
-            <DataArray as Replace<Ptr, Next<<DataArray as GetIndex<Ptr>>::Output>>>::Output,
-        >,
+    DataArray: GetIndex<Ptr> + GetIndex<_0> + Replace<Ptr, Next<tcrts::index!(DataArray, Ptr)>>,
+    NextInstrs:
+        Interpret<Ptr, tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>)>,
 {
     type DataArray = <NextInstrs as Interpret<
         Ptr,
-        <DataArray as Replace<Ptr, Next<<DataArray as GetIndex<Ptr>>::Output>>>::Output,
+        tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>),
     >>::DataArray;
 }
 
 // - instruction
 impl<NextInstrs, Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Cons<Dec, NextInstrs>
 where
-    DataArray: GetIndex<Ptr>
-        + Replace<Ptr, <<DataArray as GetIndex<Ptr>>::Output as PeanoSub<Next<Zero>>>::Output>,
+    DataArray: GetIndex<Ptr> + Replace<Ptr, tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)>,
     <DataArray as GetIndex<Ptr>>::Output: PeanoSub<tcrts::number::Next<Zero>>,
     NextInstrs: Interpret<
             Ptr,
-            <DataArray as Replace<
+            tcrts::replace!(
+                DataArray,
                 Ptr,
-                <<DataArray as GetIndex<Ptr>>::Output as PeanoSub<Next<Zero>>>::Output,
-            >>::Output,
+                tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
+            ),
         >,
 {
     type DataArray = <NextInstrs as Interpret<
         Ptr,
-        <DataArray as Replace<
+        tcrts::replace!(
+            DataArray,
             Ptr,
-            <<DataArray as GetIndex<Ptr>>::Output as PeanoSub<_1>>::Output,
-        >>::Output,
+            tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
+        ),
     >>::DataArray;
 }
 
@@ -85,13 +82,13 @@ where
     type DataArray = <NextInstrs as Interpret<Next<Ptr>, DataArray>>::DataArray;
 }
 
-// - instruction
+// < instruction
 impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Shl, NextInstrs>
 where
     Ptr: Num + PeanoSub<Next<Zero>>,
     NextInstrs: Interpret<<Ptr as PeanoSub<Next<Zero>>>::Output, DataArray>,
 {
-    type DataArray = <NextInstrs as Interpret<<Ptr as PeanoSub<_1>>::Output, DataArray>>::DataArray;
+    type DataArray = <NextInstrs as Interpret<tcrts::subtract!(Ptr, _1), DataArray>>::DataArray;
 }
 
 fn main() {

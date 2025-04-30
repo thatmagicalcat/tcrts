@@ -1,25 +1,22 @@
-pub mod append;
-pub mod enumerate;
-pub mod filter;
-pub mod index;
-pub mod length;
-pub mod map;
-pub mod pop;
-pub mod remove;
-pub mod replace;
+mod append;
+mod enumerate;
+mod filter;
+mod index;
+mod length;
+mod map;
+mod pop;
+mod remove;
+mod replace;
 
-pub mod all {
-    pub use super::append::*;
-    pub use super::enumerate::*;
-    pub use super::filter::*;
-    pub use super::index::*;
-    pub use super::length::*;
-    pub use super::map::*;
-    pub use super::pop::*;
-    pub use super::remove::*;
-    pub use super::replace::*;
-    pub use super::*;
-}
+pub use append::*;
+pub use enumerate::*;
+pub use filter::*;
+pub use index::*;
+pub use length::*;
+pub use map::*;
+pub use pop::*;
+pub use remove::*;
+pub use replace::*;
 
 use crate::all::*;
 
