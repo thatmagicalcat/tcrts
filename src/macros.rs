@@ -78,6 +78,6 @@ macro_rules! replace {
 #[macro_export]
 macro_rules! condition {
     [ $condition:ty => $truety:ty | $falsety:ty ] => {
-        <$condition as tcrts::conditional::Conditional<$truety, $falsety>>::Output
+        <$condition as $crate::conditional::Conditional<$truety, $falsety>>::Output
     };
 }

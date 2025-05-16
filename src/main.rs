@@ -1,4 +1,4 @@
-#![recursion_limit = "2048"]
+#![recursion_limit = "1024"]
 #![allow(unused)]
 
 use tcrts::all::*;
@@ -20,6 +20,8 @@ struct Shl;
 struct Shr;
 struct Inc;
 struct Dec;
+struct LoopStart;
+struct LoopEnd;
 
 trait Instr {}
 
@@ -27,32 +29,57 @@ impl Instr for Shl {}
 impl Instr for Shr {}
 impl Instr for Inc {}
 impl Instr for Dec {}
+impl Instr for LoopStart {}
+impl Instr for LoopEnd {}
 
 type Cells = macros::list![_0, _0, _0, _0, _0, _0, _0, _0, _0, _0, _0]; // 11
-trait Interpret<Ptr: Num = Zero, DataArray = Cells> {
+
+/*
+    But what LoopStack should contain?
+    - Instructions including loop start
+    - Cell ptr of the condition cell
+
+    Pair<Instrs, CellPtr> ?!??!
+
+    What should happen at the loop end
+    - Pop loop stack
+    - Check for condition
+    - If condition cell is 0, continue down the Instructions
+    - else, go back to Instrs
+*/
+
+trait Interpret<Ptr, DataArray, LoopStack> {
     type DataArray;
 }
 
-impl<Ptr: Num, DataArray> Interpret<Ptr, DataArray> for Nil {
+impl<Ptr: Num, DataArray, LoopStack> Interpret<Ptr, DataArray, LoopStack> for Nil {
     type DataArray = DataArray;
 }
 
 // + instruction
-impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Inc, NextInstrs>
+impl<NextInstrs, Ptr, DataArray, LoopStack> Interpret<Ptr, DataArray, LoopStack>
+    for Cons<Inc, NextInstrs>
 where
     Ptr: Num,
     DataArray: GetIndex<Ptr> + GetIndex<_0> + Replace<Ptr, Next<tcrts::index!(DataArray, Ptr)>>,
-    NextInstrs:
-        Interpret<Ptr, tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>)>,
+    NextInstrs: Interpret<
+            Ptr,
+            tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>),
+            LoopStack,
+        >,
 {
     type DataArray = <NextInstrs as Interpret<
         Ptr,
         tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>),
+        LoopStack,
     >>::DataArray;
+
+    // type LoopStack = LoopStack;
 }
 
 // - instruction
-impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Dec, NextInstrs>
+impl<NextInstrs, Ptr, DataArray, LoopStack> Interpret<Ptr, DataArray, LoopStack>
+    for Cons<Dec, NextInstrs>
 where
     Ptr: Num,
     DataArray: GetIndex<Ptr> + Replace<Ptr, tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)>,
@@ -64,6 +91,7 @@ where
                 Ptr,
                 tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
             ),
+            LoopStack,
         >,
 {
     type DataArray = <NextInstrs as Interpret<
@@ -73,43 +101,107 @@ where
             Ptr,
             tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
         ),
+        LoopStack,
     >>::DataArray;
+
+    // type LoopStack = LoopStack;
 }
 
 // > instruction
-impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Shr, NextInstrs>
+impl<NextInstrs, Ptr, DataArray, LoopStack> Interpret<Ptr, DataArray, LoopStack>
+    for Cons<Shr, NextInstrs>
 where
     Ptr: Num,
-    NextInstrs: Interpret<Next<Ptr>, DataArray>,
+    NextInstrs: Interpret<Next<Ptr>, DataArray, LoopStack>,
 {
-    type DataArray = <NextInstrs as Interpret<Next<Ptr>, DataArray>>::DataArray;
+    type DataArray = <NextInstrs as Interpret<Next<Ptr>, DataArray, LoopStack>>::DataArray;
+    // type LoopStack = LoopStack;
 }
 
 // < instruction
-impl<NextInstrs, Ptr, DataArray> Interpret<Ptr, DataArray> for Cons<Shl, NextInstrs>
+impl<NextInstrs, Ptr, DataArray, LoopStack> Interpret<Ptr, DataArray, LoopStack>
+    for Cons<Shl, NextInstrs>
 where
     Ptr: Num + PeanoSub<_1>,
-    NextInstrs: Interpret<tcrts::subtract!(Ptr, _1), DataArray>,
+    NextInstrs: Interpret<tcrts::subtract!(Ptr, _1), DataArray, LoopStack>,
 {
-    type DataArray = <NextInstrs as Interpret<tcrts::subtract!(Ptr, _1), DataArray>>::DataArray;
+    type DataArray =
+        <NextInstrs as Interpret<tcrts::subtract!(Ptr, _1), DataArray, LoopStack>>::DataArray;
+    // type LoopStack = LoopStack;
+}
+
+// [ instruction
+impl<NextInstr, Ptr, DataArray, LoopStack> Interpret<Ptr, DataArray, LoopStack>
+    for Cons<LoopStart, NextInstr>
+where
+    Ptr: Num,
+    LoopStack: Append<Pair<NextInstr, Ptr>>,
+    NextInstr: Interpret<Ptr, DataArray, <LoopStack as Append<Pair<NextInstr, Ptr>>>::Output>,
+{
+    type DataArray = <NextInstr as Interpret<
+        Ptr,
+        DataArray,
+        <LoopStack as Append<Pair<NextInstr, Ptr>>>::Output,
+    >>::DataArray;
+}
+
+// ] instruction
+impl<NextInstr, Ptr, DataArray, LoopStack> Interpret<Ptr, DataArray, LoopStack>
+    for Cons<LoopEnd, NextInstr>
+where
+    Ptr: Num,
+    LoopStack: tcrts::list::LastItem + tcrts::list::Pop,
+    <LoopStack as tcrts::list::LastItem>::Output: tcrts::pair::Right,
+    DataArray: tcrts::list::GetIndex<
+            <<LoopStack as tcrts::list::LastItem>::Output as tcrts::pair::Right>::Output,
+        >,
+    <DataArray as tcrts::list::GetIndex<
+        <<LoopStack as tcrts::list::LastItem>::Output as tcrts::pair::Right>::Output,
+    >>::Output: tcrts::cmp::PeanoEq<tcrts::number::Zero>,
+    NextInstr: Interpret<Ptr, DataArray, <LoopStack as tcrts::list::Pop>::Output>,
+    <LoopStack as tcrts::list::LastItem>::Output: tcrts::pair::Left,
+    <<LoopStack as tcrts::list::LastItem>::Output as tcrts::pair::Left>::Output:
+        Interpret<Ptr, DataArray, LoopStack>, <<DataArray as tcrts::list::GetIndex<<<LoopStack as tcrts::list::LastItem>::Output as tcrts::pair::Right>::Output>>::Output as tcrts::cmp::PeanoEq<tcrts::number::Zero>>::Output: tcrts::conditional::Conditional<<NextInstr as Interpret<Ptr, DataArray, <LoopStack as tcrts::list::Pop>::Output>>::DataArray, <<<LoopStack as tcrts::list::LastItem>::Output as tcrts::pair::Left>::Output as Interpret<Ptr, DataArray, LoopStack>>::DataArray>
+{
+    type DataArray = tcrts::condition!(
+        tcrts::eq!(
+            tcrts::index!(
+                DataArray,
+                <<LoopStack as LastItem>::Output as Right>::Output
+            ),
+            Zero
+        ) =>
+            // True
+            <
+                NextInstr as
+                Interpret<
+                    Ptr,
+                    DataArray,
+                    <LoopStack as Pop>::Output
+                >>::DataArray |
+            // False
+            <
+                <<LoopStack as LastItem>::Output as Left>::Output as
+                Interpret<
+                    Ptr,
+                    DataArray,
+                    LoopStack
+                >>::DataArray
+    );
 }
 
 fn main() {
     #[rustfmt::skip]
     type InstructionSet = macros::list![
-    //  +++->
-        Inc, Inc, Inc, Dec, Shr,
-    //  +>
-        Inc, Shr,
-    //  +++-
-        Inc, Inc, Inc, Dec
+        Inc, Inc, Inc, LoopStart, Dec, LoopEnd,
     ];
-
-    // output should be [2, 1, 2, ..]
 
     println!(
         "Output: {:?}",
-        macros::list_to_array!(<InstructionSet as Interpret>::DataArray, 0..11)
+        macros::list_to_array!(
+            <InstructionSet as Interpret<Zero, Cells, Nil>>::DataArray,
+            0..11
+        )
     );
 }
 

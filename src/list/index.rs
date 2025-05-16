@@ -1,5 +1,28 @@
 use super::*;
 
+pub trait FirstItem {
+    type Output;
+}
+
+pub trait LastItem {
+    type Output;
+}
+
+impl<H, T> FirstItem for Cons<H, T> {
+    type Output = H;
+}
+
+impl <H> LastItem for Cons<H, Nil> {
+    type Output = H;
+}
+
+impl<H, T> LastItem for Cons<H, T>
+where
+    T: LastItem,
+{
+    type Output = <T as LastItem>::Output;
+}
+
 pub trait GetIndex<Index> {
     type Output;
 }
