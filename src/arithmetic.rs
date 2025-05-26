@@ -1,15 +1,15 @@
 use super::number::*;
 
-pub trait PeanoAdd<N> {
+pub trait PeanoAdd<N: Num> {
     type Output: Num;
 }
 
-pub trait PeanoSub<N> {
+pub trait PeanoSub<N: Num> {
     type Output: Num;
 }
 
-pub trait PeanoMul<N> {
-    type Output;
+pub trait PeanoMul<N: Num> {
+    type Output: Num;
 }
 
 // N * 0 = 0
@@ -21,6 +21,7 @@ impl<N, M> PeanoMul<Next<M>> for N
 where
     N: Num + PeanoMul<M> + PeanoAdd<<N as PeanoMul<M>>::Output>,
     M: Num,
+    <N as PeanoMul<M>>::Output: Num,
 {
     type Output = <N as PeanoAdd<<N as PeanoMul<M>>::Output>>::Output;
 }

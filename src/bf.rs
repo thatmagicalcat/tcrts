@@ -1,0 +1,219 @@
+#![recursion_limit = "1024"]
+#![allow(unused)]
+
+use tcrts::all::*;
+
+type _0 = Zero;
+type _1 = Next<_0>;
+type _2 = Next<_1>;
+type _3 = Next<_2>;
+type _4 = Next<_3>;
+type _5 = Next<_4>;
+type _6 = Next<_5>;
+type _7 = Next<_6>;
+type _8 = Next<_7>;
+type _9 = Next<_8>;
+
+type _50 = macros::apply!(Next, Zero, 50);
+
+struct Shl;
+struct Shr;
+struct Inc;
+struct Dec;
+struct LoopStart;
+struct LoopEnd;
+
+trait Instr {}
+
+impl Instr for Shl {}
+impl Instr for Shr {}
+impl Instr for Inc {}
+impl Instr for Dec {}
+impl Instr for LoopStart {}
+impl Instr for LoopEnd {}
+
+type Cells = macros::list![_0, _0, _0, _0, _0, _0, _0, _0, _0, _0, _0]; // 11
+
+trait Interpret<Ptr, DataArray, Loop> {
+    type DataArray;
+}
+
+impl<Ptr: Num, DataArray, Loop> Interpret<Ptr, DataArray, Loop> for Nil {
+    type DataArray = DataArray;
+}
+
+// + instruction
+impl<NextInstrs, Ptr, DataArray, Loop> Interpret<Ptr, DataArray, Loop> for Cons<Inc, NextInstrs>
+where
+    Ptr: Num,
+    DataArray: GetIndex<Ptr> + GetIndex<_0> + Replace<Ptr, Next<tcrts::index!(DataArray, Ptr)>>,
+    NextInstrs:
+        Interpret<Ptr, tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>), Loop>,
+{
+    type DataArray = <NextInstrs as Interpret<
+        Ptr,
+        tcrts::replace!(DataArray, Ptr, Next<tcrts::index!(DataArray, Ptr)>),
+        Loop,
+    >>::DataArray;
+}
+
+// - instruction
+impl<NextInstrs, Ptr, DataArray, Loop> Interpret<Ptr, DataArray, Loop> for Cons<Dec, NextInstrs>
+where
+    Ptr: Num,
+    DataArray: GetIndex<Ptr> + Replace<Ptr, tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)>,
+    <DataArray as GetIndex<Ptr>>::Output: PeanoSub<_1>,
+    NextInstrs: Interpret<
+            Ptr,
+            tcrts::replace!(
+                DataArray,
+                Ptr,
+                tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
+            ),
+            Loop,
+        >,
+{
+    type DataArray = <NextInstrs as Interpret<
+        Ptr,
+        tcrts::replace!(
+            DataArray,
+            Ptr,
+            tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
+        ),
+        Loop,
+    >>::DataArray;
+}
+
+// > instruction
+impl<NextInstrs, Ptr, DataArray, Loop> Interpret<Ptr, DataArray, Loop> for Cons<Shr, NextInstrs>
+where
+    Ptr: Num,
+    NextInstrs: Interpret<Next<Ptr>, DataArray, Loop>,
+{
+    type DataArray = <NextInstrs as Interpret<Next<Ptr>, DataArray, Loop>>::DataArray;
+    // type Loop = Loop;
+}
+
+// < instruction
+impl<NextInstrs, Ptr, DataArray, Loop> Interpret<Ptr, DataArray, Loop> for Cons<Shl, NextInstrs>
+where
+    Ptr: Num + PeanoSub<_1>,
+    NextInstrs: Interpret<tcrts::subtract!(Ptr, _1), DataArray, Loop>,
+{
+    type DataArray =
+        <NextInstrs as Interpret<tcrts::subtract!(Ptr, _1), DataArray, Loop>>::DataArray;
+    // type Loop = Loop;
+}
+
+// [ instruction
+impl<NextInstrs, Ptr, DataArray, Loop> Interpret<Ptr, DataArray, Loop>
+    for Cons<LoopStart, NextInstrs>
+where
+    NextInstrs: Interpret<Ptr, DataArray, Pair<NextInstrs, Ptr>>,
+{
+    type DataArray = <NextInstrs as Interpret<Ptr, DataArray, Pair<NextInstrs, Ptr>>>::DataArray;
+}
+
+// ] instruction
+impl<NextInstrs, Ptr, DataArray, Loop> Interpret<Ptr, DataArray, Loop> for Cons<LoopEnd, NextInstrs>
+where
+    NextInstrs: Interpret<Ptr, DataArray, Nil>,
+    Loop: Right + Left,
+    DataArray: GetIndex<<Loop as Right>::Output>,
+    <DataArray as GetIndex<<Loop as Right>::Output>>::Output: PeanoEq<Zero>,
+    <<DataArray as GetIndex<<Loop as Right>::Output>>::Output as PeanoEq<Zero>>::Output:
+        Conditional<
+                <NextInstrs as Interpret<Ptr, DataArray, Nil>>::DataArray,
+                <<Loop as Left>::Output as Interpret<Ptr, DataArray, Loop>>::DataArray,
+            >,
+    <Loop as Left>::Output: Interpret<Ptr, DataArray, Loop>,
+{
+    type DataArray = tcrts::condition! {
+        tcrts::eq!(tcrts::index!(DataArray, <Loop as Right>::Output), Zero)
+        => <
+            NextInstrs as
+            Interpret<Ptr, DataArray, Nil>
+        >::DataArray
+        | <<Loop as Left>::Output as Interpret<Ptr, DataArray, Loop>>::DataArray
+    };
+}
+
+pub fn main() {
+    #[rustfmt::skip]
+    type InstructionSet = macros::list![
+        // LoopStart, LoopEnd,
+    ];
+
+    println!(
+        "Output: {:?}",
+        macros::list_to_array!(
+            <InstructionSet as Interpret<Zero, Cells, Nil>>::DataArray,
+            0..11
+        )
+    );
+}
+
+// struct Square;
+// impl<N: Num + tcrts::arithmetic::PeanoMul<N>> TypeFn<N> for Square {
+//     type Output = <N as PeanoMul<N>>::Output;
+// }
+
+// struct LessThan50;
+// impl<N> TypeFn<N> for LessThan50
+// where
+//     N: Num + PeanoLt<_50>,
+// {
+//     type Output = <N as PeanoLt<_50>>::Output;
+// }
+
+// struct GetLeft;
+// impl<L, R> TypeFn<Pair<L, R>> for GetLeft {
+//     type Output = L;
+// }
+
+// struct GetRight;
+// impl<L, R> TypeFn<Pair<L, R>> for GetRight {
+//     type Output = R;
+// }
+
+// fn main() {
+//     type List = macros::list![_0, _1, _2, _3, _4, _5, _6, _7, _8, _9];
+
+//     // square all elements
+//     type ListSq = <List as Map<Square>>::Output;
+
+//     println!("         list: {:?}", macros::list_to_array!(List, 0..=9));
+//     println!("squared  list: {:?}", macros::list_to_array!(ListSq, 0..=9));
+
+//     type FilteredList = <ListSq as Filter<LessThan50>>::Output;
+//     println!(
+//         "filtered list: {:?}",
+//         macros::list_to_array!(FilteredList, 0..=7) // two items removed
+//     );
+
+//     type List2 = macros::list![_1, _1, _1, _9];
+//     type List2Length = <List2 as Length>::Output;
+
+//     #[rustfmt::skip]
+//     type Last = <
+//         List2 as GetIndex<
+//             <
+//                 <List2 as Length>::Output
+//                 as PeanoSub<_1> // length - 1
+//             >::Output
+//         >
+//     >::Output;
+
+//     println!("Last element: {}", Last::VALUE);
+
+//     type Enumerated = <List2 as Enumerate>::Output;
+
+//     type LeftEnumerated = <Enumerated as Map<GetLeft>>::Output;
+//     println!("left: {:?}", macros::list_to_array!(LeftEnumerated, 0..=3));
+
+//     type RightEnumerated = <Enumerated as Map<GetRight>>::Output;
+//     println!(
+//         "right: {:?}",
+//         macros::list_to_array!(RightEnumerated, 0..=3)
+//     );
+// }

@@ -7,6 +7,7 @@ pub trait Enumerate<Start = Zero> {
 impl<H, T, I> Enumerate<I> for Cons<H, T>
 where
     T: Enumerate<Next<I>>,
+    I: Num,
 {
     type Output = Cons<Pair<I, H>, <T as Enumerate<Next<I>>>::Output>;
 }

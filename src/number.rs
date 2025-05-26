@@ -25,7 +25,7 @@ pub struct Zero;
 
 /// A wrapper type to represent the successor of a number in Peano arithmetic.
 /// Read `Num` trait's documentation for more details.
-pub struct Next<N>(std::marker::PhantomData<N>);
+pub struct Next<N: Num>(std::marker::PhantomData<N>);
 
 impl Num for Zero {}
 impl<N: Num> Num for Next<N> {}
