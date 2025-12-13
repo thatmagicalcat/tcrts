@@ -64,14 +64,12 @@ where
     DataArray: GetIndex<Ptr> + Replace<Ptr, tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)>,
     <DataArray as GetIndex<Ptr>>::Output: PeanoSub<_1>,
     NextInstrs: Interpret<
+        Ptr, tcrts::replace!(
+            DataArray,
             Ptr,
-            tcrts::replace!(
-                DataArray,
-                Ptr,
-                tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
-            ),
-            Loop,
-        >,
+            tcrts::subtract!(tcrts::index!(DataArray, Ptr), _1)
+        ), Loop,
+    >,
 {
     type DataArray = <NextInstrs as Interpret<
         Ptr,

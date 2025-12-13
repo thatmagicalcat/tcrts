@@ -1,6 +1,6 @@
+use crate::binaryop::*;
 use crate::boolean::*;
 use crate::number::*;
-use crate::binaryop::*;
 
 pub trait PeanoEq<N> {
     type Output: Boolean;
@@ -39,9 +39,8 @@ where
 // x >= y is just !(x < y)
 impl<N, M> PeanoGEq<M> for N
 where
-    N: Num + PeanoLt<M> + PeanoEq<M>,
+    N: Num + PeanoLt<M>,
     M: Num,
-    <N as PeanoLt<M>>::Output: Or<<N as PeanoEq<M>>::Output>,
     <N as PeanoLt<M>>::Output: Not,
 {
     type Output = <<N as PeanoLt<M>>::Output as Not>::Output;
@@ -109,5 +108,3 @@ where
 {
     type Output = <N as PeanoEq<M>>::Output;
 }
-
-

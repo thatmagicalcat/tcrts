@@ -21,10 +21,10 @@ impl Boolean for False {
     type Value = Zero;
 }
 
-impl ToVal for True {
-    const VALUE: usize = 1;
-}
-
-impl ToVal for False {
-    const VALUE: usize = 0;
+impl<B> ToVal for B
+where
+    B: Boolean,
+    B::Value: ToVal,
+{
+    const VALUE: usize = B::Value::VALUE;
 }
