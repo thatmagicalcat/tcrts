@@ -7,6 +7,7 @@ mod map;
 mod pop;
 mod remove;
 mod replace;
+mod array;
 mod reverse;
 
 pub use append::*;
@@ -18,6 +19,7 @@ pub use map::*;
 pub use pop::*;
 pub use remove::*;
 pub use replace::*;
+pub use array::*;
 pub use reverse::*;
 
 use crate::all::*;

@@ -1,0 +1,51 @@
+use super::*;
+
+pub trait Array {
+    const OUTPUT: &'static [usize];
+}
+
+macro_rules! impl_array {
+    [] => {
+        impl Array for Nil {
+            const OUTPUT: &'static [usize] = &[];
+        }
+    };
+
+    [ $($t:ident),+ ] => {
+        impl<$($t: ToVal),+> Array for impl_array!(@cons $($t),+) {
+            const OUTPUT: &'static [usize] = &[$($t::VALUE),+];
+        }
+    };
+
+    [ @cons $head:ident ] => {
+        Cons<$head, Nil>
+    };
+
+    [ @cons $head:ident, $($tail:ident),+ ] => {
+        Cons<$head, impl_array!(@cons $($tail),+)>
+    };
+}
+
+macro_rules! gen_impls {
+    [ $($t:ident),* ] => {
+        gen_impls!(@acc (); $($t),*);
+    };
+
+    // stop
+    [ @acc ( $($acc:ident),* ); ] => {};
+
+    // grow accumulator
+    [ @acc ( $($acc:ident),* ); $head:ident $(, $tail:ident)* ] => {
+        impl_array!($($acc),*);
+        gen_impls!(@acc ( $($acc,)* $head); $($tail),*);
+    }
+}
+
+gen_impls!(
+    T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21,
+    T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32, T33, T34, T35, T36, T37, T38, T39, T40,
+    T41, T42, T43, T44, T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56, T57, T58, T59,
+    T60, T61, T62, T63
+
+    // recursion limit :(
+);
