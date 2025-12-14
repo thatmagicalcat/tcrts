@@ -2,6 +2,11 @@
 name = "tcrts"
 version = "0.1.0"
 edition = "2024"
+authors = ["thatmagicalcat <thatmagicalcat@hotmail.com>"]
+description = ""
+repository = "https://github.com/thatmagicalcat/tcrts"
+license = "GPL-3.0-only"
+readme = "README.md"
 
 [dependencies]
-macros = { version = "0.1.0", path = "macros" }
+tcrts-macros = { version = "0.1.0", path = "macros" }

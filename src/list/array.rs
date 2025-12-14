@@ -17,13 +17,8 @@ macro_rules! impl_array {
         }
     };
 
-    [ @cons $head:ident ] => {
-        Cons<$head, Nil>
-    };
-
-    [ @cons $head:ident, $($tail:ident),+ ] => {
-        Cons<$head, impl_array!(@cons $($tail),+)>
-    };
+    [ @cons $head:ident ] => { Cons<$head, Nil> };
+    [ @cons $head:ident, $($tail:ident),+ ] => { Cons<$head, impl_array!(@cons $($tail),+)> };
 }
 
 macro_rules! gen_impls {
@@ -31,10 +26,7 @@ macro_rules! gen_impls {
         gen_impls!(@acc (); $($t),*);
     };
 
-    // stop
     [ @acc ( $($acc:ident),* ); ] => {};
-
-    // grow accumulator
     [ @acc ( $($acc:ident),* ); $head:ident $(, $tail:ident)* ] => {
         impl_array!($($acc),*);
         gen_impls!(@acc ( $($acc,)* $head); $($tail),*);

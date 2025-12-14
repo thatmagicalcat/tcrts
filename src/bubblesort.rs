@@ -1,4 +1,5 @@
 use tcrts::all::*;
+use tcrts_macros as macros;
 
 type _0 = Zero;
 type _1 = Next<_0>;
@@ -101,17 +102,18 @@ where
     type Output = <<L as BubblePass>::Output as BubbleSort<Count>>::Output;
 }
 
-impl <L: List> BubbleSort<Zero> for L {
+impl<L: List> BubbleSort<Zero> for L {
     type Output = L;
+}
+
+fn print_ty<T>() {
+    println!("{}", std::any::type_name::<T>());
 }
 
 pub fn main() {
     type List = macros::list![_9, _5, _2, _3, _8, _1, _0];
     type N = <List as Length>::Output;
     type SortedList = <List as BubbleSort<N>>::Output;
-    println!("{:?}", macros::list_to_array!(SortedList, 0..=6));
-}
 
-fn print_ty<T>() {
-    println!("{}", std::any::type_name::<T>());
+    println!("{:?}", macros::list_to_array!(SortedList, 0..=6));
 }

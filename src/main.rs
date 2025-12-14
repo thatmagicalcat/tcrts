@@ -2,7 +2,9 @@
 #![allow(unused)]
 
 mod bubblesort;
+mod brainfuck;
 
 fn main() {
-    bubblesort::main();
+    brainfuck::main();
+    // bubblesort::main();
 }
