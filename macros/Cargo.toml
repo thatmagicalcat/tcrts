@@ -2,6 +2,11 @@
 name = "tcrts-macros"
 version = "0.1.0"
 edition = "2024"
+description = "Helper macros for tcrts project"
+authors = ["thatmagicalcat <thatmagicalcat@hotmail.com>"]
+repository = "https://github.com/thatmagicalcat/tcrts"
+license = "GPL-3.0-only"
+readme = "README.md"
 
 [lib]
 proc-macro = true
